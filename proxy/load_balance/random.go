@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/go-basiclibrary/wgateway/proxy/load_balance/cfg"
 	"math/rand"
 )
 
