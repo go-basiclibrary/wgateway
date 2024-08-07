@@ -9,6 +9,7 @@ import (
 
 var addr = "127.0.0.1:2002"
 
+// 简单实现一个http反向代理
 func main() {
 	rs1 := "http://127.0.0.1:2003/base"
 	url1, err := url.Parse(rs1)
