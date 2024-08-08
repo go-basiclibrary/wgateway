@@ -3,11 +3,10 @@ package main
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 )
 
 func main() {
-	rb := &RandomBalance{}
+	rb := &RoundRobinBalance{}
 	rb.Add("127.0.0.1:2003") //0
 	rb.Add("127.0.0.1:2004") //1
 	rb.Add("127.0.0.1:2005") //2
@@ -25,28 +24,35 @@ func main() {
 	fmt.Println(rb.Next())
 }
 
-// RandomBalance 随机负载均衡
-type RandomBalance struct {
+type RoundRobinBalance struct {
 	curIndex int
 	rss      []string
-
-	// 观察者模式
+	//观察主体
 	conf LoadBalanceConf
 }
 
-func (r *RandomBalance) Add(params ...string) error {
+func (r *RoundRobinBalance) Add(params ...string) error {
 	if len(params) == 0 {
-		return errors.New("params len 1 at least")
+		return errors.New("param len 1 at least")
 	}
 	addr := params[0]
 	r.rss = append(r.rss, addr)
 	return nil
 }
 
-func (r *RandomBalance) Next() string {
+func (r *RoundRobinBalance) Next() string {
 	if len(r.rss) == 0 {
 		return ""
 	}
-	r.curIndex = rand.Intn(len(r.rss))
-	return r.rss[r.curIndex]
+	lens := len(r.rss)
+	if r.curIndex >= lens {
+		r.curIndex = 0
+	}
+	curAddr := r.rss[r.curIndex]
+	r.curIndex = (r.curIndex + 1) % lens
+	return curAddr
+}
+
+func (r *RoundRobinBalance) Get(key string) (string, error) {
+	return r.Next(), nil
 }
